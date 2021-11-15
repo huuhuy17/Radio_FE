@@ -1,0 +1,21 @@
+.login-components{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    overflow-y: -moz-hidden-unscrollable;
+}
+
+
+.container-login{
+    width: 600px;
+    height: 400px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+}
+
+.radio-title{
+    color: #fc001f;
+    font-size: 25px;
+    font-weight: bold;
+}
