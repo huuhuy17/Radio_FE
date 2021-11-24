@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import reactDom from "react-dom";
+import api from "../api";
 
 function callGetHistory() {
   const get_History = async () => {
     const data = {
       id_user: document.cookie,
     };
-    const result = await axios.post("http://127.0.0.1:5000/getHistory", data);
+    const result = await axios.post(api + "/getHistory", data);
     return result;
   };
   get_History().then((res) => {

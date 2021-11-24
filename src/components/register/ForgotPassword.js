@@ -1,4 +1,4 @@
-import { useState } from "react";
+// import { useState } from "react";
 import {
     getAuth,
     RecaptchaVerifier,
@@ -6,9 +6,11 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import accountIcon from "../../Icon/user_account_icon.png";
-import {Button, Col, Form, Input, Row, Select} from "antd";
+import {Button, Col, Form, Row, Input} from "antd";
 import {LockOutlined, PhoneOutlined, UserOutlined} from "@ant-design/icons";
 import axios from "axios";
+import {useHistory} from "react-router-dom";
+import api from "../api";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBNjZlL8ZKCWiBqjtIlvQp1v2iIwXb6-dU",
@@ -23,26 +25,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export default function App() {
-    const [state, setState] = useState();
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
-    const getUsername = (e) => {
-        setUsername(e.target.value)
-    }
-    const getPassword = (e) => {
-        setPassword(e.target.value)
-    }
+    let phone = ""
+    let username = ""
+    let password = ""
+    let otp = ""
+    const history = useHistory();
+    const onFinish = (values) => {
+        console.log('Success:', values);
+        phone = values.phone
+        username = values.username
+        password = values.password
+        console.log(phone, username, password)
+        onSignInSubmit();
+    };
 
-    const [phone, setPhone] = useState()
-    const getPhone = (e) => {
-        setPhone(e.target.value)
+    const onFinish1 = (values) => {
+        console.log(values)
+        otp = values.otp
+        console.log(otp)
+        onSubmitOTP()
     }
-    // const handelChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setState({
-    //         [name]: value
-    //     });
-    // };
 
     const changePass = () => {
         const request = async () => {
@@ -50,20 +52,28 @@ export default function App() {
                 username: username,
                 newpassword: password,
             };
-            return await axios.post("http://127.0.0.1:5000/forgotpassword", data);
+            return await axios.post(api + "/forgotpassword", data);
         }
+        request().then((res) => {
+            console.log(res.data)
+            if(res.data === "DONE") {
+                alert("Xác thực thành công! Tài khoản của bạn đã được đặt mật khẩu mới!")
+                history.push('/login')
+            }
+        }).catch((error) =>{
+            console.log(error)
+            alert("Xảy ra lỗi! Vui lòng thử lại!")
+        })
     }
 
     const auth = getAuth(app);
     const configureCaptcha = () => {
-        // const auth = getAuth()
-        console.log("auth", auth);
-
-        auth.settings.appVerificationDisabledForTesting = true;
+        // console.log("auth", auth);
+        auth.settings.appVerificationDisabledForTesting = false;
         window.recaptchaVerifier = new RecaptchaVerifier(
             "sign-in-button",
             {
-                size: "invisible",
+                size: "visible",
                 defaultCountry: "VN"
             },
             auth
@@ -71,71 +81,40 @@ export default function App() {
     };
 
     const onSignInSubmit = (e)=>{
-        e.preventDefault();
+        // e.preventDefault();
         configureCaptcha();
-        auth.settings.appVerificationDisabledForTesting = false;
+        // auth.settings.appVerificationDisabledForTesting = false;
         let phoneNumber = phone - "0" ;
         phoneNumber = "+84" + phoneNumber
         console.log(phoneNumber);
         const appVerifier = window.recaptchaVerifier;
-
-        console.log("appVerifier", appVerifier);
-
         signInWithPhoneNumber(auth,phoneNumber, appVerifier)
             .then((confirmationResult) => {
-
                 window.confirmationResult = confirmationResult;
-                alert("OTP has been sent");
-
+                alert("OTP đã được gửi!");
             })
             .catch((error) => {
-
-                alert("sms not send");
-
+                alert("Lỗi gửi OTP!");
                 console.log(error);
 
             });
     };
     function onSubmitOTP(e){
-        e.preventDefault();
-        let code = state.otp;
+        let code = otp;
         console.log("OTP typed is: ",code)
         window.confirmationResult.confirm(code).then((result) => {
-            const user = result.user;
-            console.log(JSON.stringify(user))
-            alert("Đã xác minh!")
-
+            changePass();
         }).catch((error) =>{
             console.log(error)
-            alert("Lỗi xác minh!")
+            alert("Xác thực thất bại!")
         })
     }
     return (
         <div className="App">
-            {/*<h2>Forgot Password</h2>*/}
-            {/*<form onSubmit={onSignInSubmit}>*/}
-            {/*    <div id="sign-in-button"/>*/}
-            {/*    <input*/}
-            {/*        type="number"*/}
-            {/*        name="mobile"*/}
-            {/*        placeholder="Mobile number"*/}
-            {/*        required*/}
-            {/*        onChange={handelChange}*/}
-            {/*    />*/}
-            {/*    <button type="submit" >*/}
-            {/*        submit*/}
-            {/*    </button>*/}
-            {/*</form>*/}
-
-            {/*<h2>Enter OTP </h2>*/}
-            {/*<form onSubmit={onSubmitOTP}>*/}
-            {/*    <input type="number" name="otp" placeholder="OTP number" required onChange={handelChange}/>*/}
-            {/*    <button type="submit">submit</button>*/}
-            {/*</form>*/}
             <div className='login-components'>
             <div className='container-login'>
                 <div>
-                    <img src={accountIcon} style={{width: 50, height: 50, marginTop: 10}}/>
+                    <img src={accountIcon} style={{width: 50, height: 50, marginTop: 10}} alt=""/>
                 </div>
                 <span>
                     Quên mật khẩu
@@ -145,10 +124,7 @@ export default function App() {
                         <Form
                             name="normal_login"
                             className="login-form"
-                            initialValues={{
-                                remember: true,
-                            }}
-                            onSubmit={onSignInSubmit}
+                            onFinish={onFinish}
                         >
                             <Form.Item
                                 name="username"
@@ -160,7 +136,7 @@ export default function App() {
                                 ]}
                             >
                                 <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username"
-                                       onChange={getUsername}
+                                       // onChange={getUsername}
                                        required
                                 />
                             </Form.Item>
@@ -177,12 +153,10 @@ export default function App() {
                                     prefix={<LockOutlined className="site-form-item-icon" />}
                                     type="password"
                                     placeholder="New password"
-                                    onChange={getPassword}
-                                    required
                                 />
                             </Form.Item>
                             <Form.Item
-                                name="mobile"
+                                name="phone"
                                 type="number"
                                 rules={[
                                     {
@@ -192,8 +166,7 @@ export default function App() {
                                 ]}
                             >
                                 <Input prefix={<PhoneOutlined />} placeholder="Nhập số điện thoại"
-                                       onChange={getPhone}
-                                       required
+                                       name="mobile"
                                 />
                             </Form.Item>
                             <Form.Item>
@@ -205,9 +178,9 @@ export default function App() {
                             </Form.Item>
                         </Form>
 
-                        <Form>
+                        <Form onFinish={onFinish1}>
                             <Form.Item
-                                name="role"
+                                name="otp"
                                 label="OTP"
                                 rules={[
                                     {
@@ -237,8 +210,12 @@ export default function App() {
                         </Form>
                     </Col>
                 </Row>
+
             </div>
              </div>
+            <div style={{display: 'flex',justifyContent: 'center'}}>
+                <div id="sign-in-button" />
+            </div>
         </div>
     );
 }

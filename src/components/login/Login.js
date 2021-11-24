@@ -2,11 +2,12 @@ import "./Login.css";
 import axios from "axios";
 import {useHistory} from "react-router-dom";
 import 'antd/dist/antd.css';
-import {Alert, Button, Checkbox, Col, Form, Input, Row} from 'antd';
+import {Button, Checkbox, Col, Form, Input, Row} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import accountIcon from '../../Icon/user_account_icon.png'
 import radioIcon from "../../Icon/Circle-icons-radio.svg"
 import {useState} from "react";
+import api from "../api";
 
 function Login() {
   const history = useHistory();
@@ -24,22 +25,25 @@ function Login() {
         username: username,
         password: password,
       };
-      return await axios.post("http://127.0.0.1:5000/login", data);
+      return await axios.post(api + "/login", data);
     };
     loginChatApp().then((res) => {
-      const type = res.data.acc_type;
-      console.log(res.data)
-      document.cookie = res.data.id;
-      if (type === 1) {
-        history.push("/admin");
-        alert("Bạn đã đăng nhập thành công với tư cách quản trị viên!");
-      } else if(type === 0){
-        history.push("/client");
-        alert("Bạn đã đăng nhập thành công với tư cách người dùng!");
+      if(res.data != null){
+        const type = res.data.acc_type;
+        document.cookie = res.data.id;
+        if (type === 1) {
+          history.push("/admin");
+          alert("Bạn đã đăng nhập thành công với tư cách quản trị viên!");
+        } else if(type === 0){
+          history.push("/client");
+          alert("Bạn đã đăng nhập thành công với tư cách người dùng!");
+        }
       }
       else {
         alert("Tài khoản hoặc mật khẩu không đúng!")
       }
+    }).catch((error) =>{
+      alert("Xảy ra lỗi. Vui lòng thử lại!")
     });
   };
 
@@ -54,7 +58,7 @@ function Login() {
           </div>
 
           <div>
-            <img src={accountIcon} style={{width: 50, height: 50, marginBottom: 20}}/>
+            <img src={accountIcon} style={{width: 50, height: 50, marginBottom: 20}} alt="account-icon"/>
           </div>
           <span>
             Đăng nhập

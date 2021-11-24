@@ -6,7 +6,6 @@ import Channel from './components/admin/Admin';
 import History from './components/client/History';
 import Favorite from './components/client/Favorite';
 import Register from "./components/register/Register";
-import EditChannel from "./components/admin/EditChannel";
 import ForgotPassword from "./components/register/ForgotPassword";
 
 function App(){
@@ -22,7 +21,6 @@ function App(){
           <Route exact path={"/favorite"} component={Favorite}/>
           <Route exact path={"/register"} component={Register}/>
           <Route exact path={"/forgot"} component={ForgotPassword}/>
-          <Route exact path={"/editChannel"} component={EditChannel}/>
         </Switch>
       </BrowserRouter>
     </div>

@@ -5,6 +5,7 @@ import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import {useHistory} from "react-router-dom";
 import {useState} from "react";
 import accountIcon from "../../Icon/user_account_icon.png";
+import api from "../api";
 
 const { Option } = Select;
 const Register = () => {
@@ -30,13 +31,13 @@ const Register = () => {
                 acc_type: type,
             };
             return await axios.post(
-                "http://127.0.0.1:5000/addAccount",
+                api + "/addAccount",
                 data
             );
         };
         add_toDB().then((res) => {
             console.log(res);
-            alert("Thêm tài khoản thành công!");
+            alert("Đăng ký tài khoản thành công!");
             history.push('/login')
         });
     };
@@ -45,7 +46,7 @@ const Register = () => {
         <div className='login-components'>
             <div className='container-login'>
                 <div>
-                    <img src={accountIcon} style={{width: 50, height: 50, marginTop: 60, marginBottom: 20}}/>
+                    <img src={accountIcon} style={{width: 50, height: 50, marginTop: 60, marginBottom: 20}} alt="account-icon"/>
                 </div>
                 <span>
                     Đăng ký tài khoản

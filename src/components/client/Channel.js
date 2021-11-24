@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import "./Channel.css";
 import axios from "axios";
 import {Howl} from "howler";
@@ -6,6 +6,7 @@ import reactDom from "react-dom";
 import playButton from '../../Icon/play-button-arrowhead.png'
 import hearted from '../../Icon/hearted.png'
 import pauseButton from '../../Icon/video-pause-button.png'
+import api from "../api";
 
 function Channel(props) {
   // const [play, setPlay] = useState(playButton)
@@ -17,8 +18,7 @@ function Channel(props) {
       const data = {
         c_name: channel_name,
       };
-      const result = await axios.post("http://127.0.0.1:5000/getAudio", data);
-      return result;
+      return await axios.post(api + "/getAudio", data);
     };
     getAudio().then((res) => {
       sound = new Howl({
@@ -45,9 +45,9 @@ function Channel(props) {
         id_user: document.cookie,
         id_channel: id_channel
       };
-      console.log(id_channel, document.cookie)
+      console.log(document.cookie)
       return await axios.post(
-          "http://127.0.0.1:5000/addFavoriteChannel",
+          api + "/addFavoriteChannel",
           data
       );
     };
@@ -55,11 +55,9 @@ function Channel(props) {
       console.log(res);
       if (res.data === "1") {
         alert("Đã thêm vào danh sách kênh yêu thích");
-        html1 = <div>Dislike</div>;
         isLiked = 1;
       } else {
         alert("Đã xóa khỏi danh sách kênh yêu thích");
-        html1 = <div>Like</div>;
         isLiked = 0;
       }
     });
@@ -71,8 +69,7 @@ function callAddHistory(id_channel) {
       id_user: document.cookie,
       id_channel: id_channel 
     }
-    const result = await axios.post("http://127.0.0.1:5000/addToHistory",data)
-    return result
+    return await axios.post(api + "/addToHistory", data)
   }
   addHistory().then((res) => {
     console.log(res)
@@ -103,12 +100,12 @@ function callAddHistory(id_channel) {
                   callADD(props.id_channel);
                 }}
               >
-                <img src={hearted} className="heart-button"/>
+                <img src={hearted} className="heart-button" alt="heart"/>
               </button>
               <button
                 className="btn lg btn-default neu"
                 onClick={() => {
-                  if (playing == 0) {
+                  if (playing === 0) {
                     callPlayAudio(props.name);
                     callAddHistory(props.id_channel);
                     playing = 1;
@@ -116,7 +113,7 @@ function callAddHistory(id_channel) {
                   }
                 }}
               >
-                <img src={playButton} className="play-button"/>
+                <img src={playButton} className="play-button" alt="play-btn"/>
               </button>
               <button
                 className="btn lg btn-default neu"
@@ -128,7 +125,7 @@ function callAddHistory(id_channel) {
                   };
                 }}
               >
-                <img src={pauseButton} className="pause-button-img"/>
+                <img src={pauseButton} className="pause-button-img" alt="pause-btn"/>
               </button>
             </div>
           </div>

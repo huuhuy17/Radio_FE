@@ -3,6 +3,7 @@ import './Home.css'
 import Channel from "./Channel";
 import axios from "axios";
 import reactDom from "react-dom";
+import api from "../api";
 
 
 function Home() {
@@ -12,7 +13,7 @@ function Home() {
 
   const callShowChannel = () => {
       const show_channel = async () => {
-      const result = await axios.post("http://127.0.0.1:5000/showChannel");
+      const result = await axios.post(api + "/showChannel");
         return result;
     }
     show_channel().then((res) => {

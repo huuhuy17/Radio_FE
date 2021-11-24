@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import Channel from "./Channel";
 import axios from "axios";
 import reactDom from "react-dom";
+import api from "../api";
 
 function Favorite() {
     useEffect(()=>{
@@ -12,11 +13,10 @@ function Favorite() {
       const data = {
         id_user: document.cookie,
       };
-      const result = await axios.post(
-        "http://127.0.0.1:5000/showFavoriteChannel",
-        data
+      return await axios.post(
+          api + "/showFavoriteChannel",
+          data
       );
-      return result;
     };
     show_favorite_channel().then((res) => {
       const list_channel = res.data.channel.map(function (num) {

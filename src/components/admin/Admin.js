@@ -1,18 +1,29 @@
 import axios from "axios";
 import reactDom from "react-dom";
 import ReactDOM from "react-dom";
-import React, {useState} from 'react';
+import React from 'react';
 import 'antd/dist/antd.css';
 import {Button, Form, Input} from 'antd';
+import api from "../api";
 
 function Admin() {
-  const [name, setName] = useState()
-  const [avt, setAvt] = useState()
-  const [link, setLink] = useState()
-  const [type, setType] = useState()
-
-  const onFinish = (e) => {
-    console.log(e)
+  const add_channel = (values) =>{
+    const add_toDB = async () => {
+      const data = {
+        c_icon: values.image,
+        c_name: values.channel_name,
+        c_link: values.link,
+        c_type: values.type
+      }
+      return await axios.post(api+ '/addChannel', data)
+    }
+    add_toDB().then((res) =>{
+      console.log(res);
+      alert("Thêm kênh thành công!")
+      const html1 = <div/>
+      ReactDOM.render(html1,document.getElementById("alter-something"))
+      show_radio()
+    })
   }
   function show_radio(){
 
@@ -20,118 +31,113 @@ function Admin() {
     ReactDOM.render(html1,document.getElementById("alter-something"))
     // Thêm kênh
     const box_add_channel = () =>{
-        const add_channel = () =>{
-          let channel_icon = avt
-          let channel_name = name
-          let channel_link = link
-          let channel_type = type
-          const add_toDB = async () => {
-            const data = {
-              c_icon: channel_icon,
-              c_name: channel_name,
-              c_link: channel_link,
-              c_type: channel_type
-            }
-            return await axios.post('http://127.0.0.1:5000/addChannel', data)
-          }
-          add_toDB().then((res) =>{
-            console.log(res);
-            alert("Thêm kênh thành công!")
-            const html1 = <div/>
-            ReactDOM.render(html1,document.getElementById("alter-something"))
-            show_radio()
-          })
-        }
+      const ADD = () => {
+        const onFinish = (values) => {
+          console.log('Success:', values);
+          add_channel(values)
+        };
 
-      const html = (
-          <div>
-            <Form onFinish={onFinish}>
+        const onFinishFailed = (errorInfo) => {
+          console.log('Failed:', errorInfo);
+        };
+
+        return (
+            <Form
+                name="basic"
+                labelCol={{
+                  span: 8,
+                }}
+                wrapperCol={{
+                  span: 16,
+                }}
+                initialValues={{
+                  remember: true,
+                }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
+            >
               <Form.Item
                   label="Ảnh kênh"
-                   rules={[
-                     {
-                       required: true,
-                       message: 'Please input!',
-                     },
-                   ]}
+                  name="image"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập link ảnh',
+                    },
+                  ]}
               >
-                <Input placeholder="Link ảnh"
-                       onChange={(value) => {setAvt(value); console.log(avt)}}
-                       allowClear required
-                />
+                <Input placeholder="Link ảnh"/>
               </Form.Item>
-              <Form.Item label="Tên kênh"
-                         rules={[
-                           {
-                             required: true,
-                             message: 'Please input!',
-                           },
-                         ]}
+
+              <Form.Item
+                  label="Tên kênh"
+                  name="channel_name"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập tên kênh',
+                    },
+                  ]}
               >
-                <Input placeholder="Nhập tên kênh"
-                       // onChange={getName}
-                       allowClear required
-                />
+                <Input placeholder="Nhập tên kênh"/>
               </Form.Item>
-              <Form.Item label="Đường dẫn kênh"
-                         rules={[
-                           {
-                             required: true,
-                             message: 'Please input!',
-                           },
-                         ]}
+
+              <Form.Item
+                  label="Link kênh"
+                  name="link"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập link streaming',
+                    },
+                  ]}
               >
-                <Input placeholder="Link streaming"
-                       // onChange={getLink}
-                       allowClear required
-                />
+                <Input placeholder="Link streaming"/>
               </Form.Item>
-              <Form.Item label="Loại kênh"
-                         rules={[
-                           {
-                             required: true,
-                             message: 'Please input!',
-                           },
-                         ]}
+
+              <Form.Item
+                  label="Thể loại kênh"
+                  name="type"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập thể loại kênh',
+                    },
+                  ]}
               >
-                <Input placeholder="Nhập thể loại"
-                       // onChange={getType}
-                       allowClear required
-                />
+                <Input placeholder="Nhập thể loại"/>
               </Form.Item>
-              <Form.Item>
-                <Button type="primary"
-                        onClick = {() => add_channel()}
-                        style={{marginBottom: 20, marginRight: 20}}
-                        htmltype="submit"
-                >
+
+              <Form.Item
+                  wrapperCol={{
+                    offset: 8,
+                    span: 16,
+                  }}
+              >
+                <Button type="primary" htmlType="submit">
                   Lưu
                 </Button>
               </Form.Item>
-
             </Form>
-        </div>
-      )
-      ReactDOM.render(html, document.getElementById("alter-something"));
+        );
+      };
+      ReactDOM.render(<ADD />, document.getElementById("alter-something"));
     };
 
     // Sửa kênh
     const box_alter_channel = (old_name) => {
       alert("Bạn đang sửa kênh " + old_name)
-      const alter_channel = () =>{
-        let new_icon = avt
-        let new_name = name
-        let new_link = link
-        let new_type = type
+      const alter_channel = (values) =>{
         const alter_toDB = async () => {
           const data = {
             old_name: old_name,
-            new_name: new_name,
-            new_icon: new_icon,
-            new_link: new_link,
-            new_type: new_type
+            new_name: values.channel_name,
+            new_icon: values.image,
+            new_link: values.link,
+            new_type: values.type
           }
-          return await axios.post('http://127.0.0.1:5000/alterChannel', data)
+          return await axios.post(api + '/alterChannel', data)
         }
         alter_toDB().then((res) =>{
           console.log(res);
@@ -142,29 +148,97 @@ function Admin() {
         })
 
       }
-      const html = (
-         <div>
-           <Form onFinish={onFinish}>
-             <Form.Item label="Ảnh kênh">
-               <Input placeholder="Link ảnh"  allowClear required/>
-             </Form.Item>
-             <Form.Item label="Tên kênh">
-               <Input placeholder="Nhập tên kênh" allowClear required/>
-             </Form.Item>
-             <Form.Item label="Đường dẫn kênh">
-               <Input placeholder="Link streaming"  allowClear required/>
-             </Form.Item>
-             <Form.Item label="Loại kênh">
-               <Input placeholder="Nhập thể loại" allowClear required/>
-             </Form.Item>
-             <Button type="primary" onClick = {() => alter_channel()} style={{marginBottom: 20, marginRight: 20}}>
-               Lưu thay đổi
-             </Button>
-           </Form>
+      const ALTER = () => {
+        const onFinish = (values) => {
+          console.log('Success:', values);
+          alter_channel(values)
+        };
+        const onFinishFailed = (errorInfo) => {
+          console.log('Failed:', errorInfo);
+        };
 
-        </div>
-      )
-      ReactDOM.render(html, document.getElementById("alter-something"));
+        return (
+            <Form
+                name="basic"
+                labelCol={{
+                  span: 8,
+                }}
+                wrapperCol={{
+                  span: 16,
+                }}
+                initialValues={{
+                  remember: true,
+                }}
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                autoComplete="off"
+            >
+              <Form.Item
+                  label="Ảnh kênh"
+                  name="image"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập link ảnh',
+                    },
+                  ]}
+              >
+                <Input placeholder="Link ảnh"/>
+              </Form.Item>
+
+              <Form.Item
+                  label="Tên kênh"
+                  name="channel_name"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập tên kênh',
+                    },
+                  ]}
+              >
+                <Input placeholder="Nhập tên kênh"/>
+              </Form.Item>
+
+              <Form.Item
+                  label="Link kênh"
+                  name="link"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập link streaming',
+                    },
+                  ]}
+              >
+                <Input placeholder="Link streaming"/>
+              </Form.Item>
+
+              <Form.Item
+                  label="Thể loại kênh"
+                  name="type"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng nhập thể loại kênh',
+                    },
+                  ]}
+              >
+                <Input placeholder="Nhập thể loại"/>
+              </Form.Item>
+
+              <Form.Item
+                  wrapperCol={{
+                    offset: 8,
+                    span: 16,
+                  }}
+              >
+                <Button type="primary" htmlType="submit">
+                  Lưu
+                </Button>
+              </Form.Item>
+            </Form>
+        );
+      };
+      ReactDOM.render(<ALTER/>, document.getElementById("alter-something"));
     };
 
     const delete_channel = (c_name) => {
@@ -172,7 +246,7 @@ function Admin() {
             const data = {
                 channel_name: c_name
             }
-          return await axios.post('http://127.0.0.1:5000/deleteChannel', data)
+          return await axios.post(api + '/deleteChannel', data)
         }
         del().then((res) => {
             alert("Đã xóa kênh!")
@@ -182,7 +256,7 @@ function Admin() {
 
     // Hiển thị các kênh
     const get_channel = async () => {
-      return await axios.post("http://127.0.0.1:5000/showChannel");
+      return await axios.post(api + "/showChannel");
     };
     get_channel().then((res) => {
       console.log(res.data.channel)
@@ -252,7 +326,7 @@ function Admin() {
             new_pass: new_pass,
             new_type: new_type
           }
-          return await axios.post('http://127.0.0.1:5000/alterAccount', data)
+          return await axios.post( api + '/alterAccount', data)
         }
         alter_toDB().then((res) =>{
           console.log(res);
@@ -312,7 +386,7 @@ function Admin() {
           const data = {
               id: id
           }
-        return await axios.post('http://127.0.0.1:5000/deleteAccount', data)
+        return await axios.post(api + '/deleteAccount', data)
       }
       del().then((res) => {
           alert("Đã xóa tài khoản!")
@@ -321,7 +395,7 @@ function Admin() {
   }
 
     const get_account = async () => {
-      return await axios.post("http://127.0.0.1:5000/showAccounts");
+      return await axios.post(api + "/showAccounts");
     };
     get_account().then((res) => {
       const list_channel = res.data.account.map(function (num) {
@@ -359,7 +433,7 @@ function Admin() {
             password: pass,
             acc_type: type
           }
-          return await axios.post('http://127.0.0.1:5000/addAccount', data)
+          return await axios.post(api + '/addAccount', data)
         }
         add_toDB().then((res) =>{
           console.log(res);
